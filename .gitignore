@@ -1,0 +1,14 @@
+# Binaries
+*.exe
+*.out
+/bin/
+/proxy
+
+# Local env / secrets (决策 021：敏感值零落盘)
+.env
+*.key
+*.pem
+
+# IDE
+.idea/
+.vscode/
