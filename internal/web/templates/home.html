@@ -1,0 +1,19 @@
+{{define "page_home"}}{{template "begin" .}}{{template "topnav" .}}
+<main class="container">
+<h2>知识库</h2>
+{{if not .Groups}}<div class="card muted">暂无授权的知识库——请联系管理员在管理后台授权。</div>{{end}}
+{{range .Groups}}
+<section class="group">
+  <h3>{{.Category}}<span class="count">{{len .KBs}}</span></h3>
+  <div class="grid">
+  {{range .KBs}}
+    <a class="card kb" href="/kb/{{.ID}}">
+      <div class="kb-name">{{.Name}}</div>
+      <div class="kb-desc">{{.Description}}</div>
+      <div class="kb-meta">{{.KnowledgeCount}} 篇文档 · {{if eq .Permission "editor"}}可编辑{{else}}只读{{end}}</div>
+    </a>
+  {{end}}
+  </div>
+</section>
+{{end}}
+</main>{{template "end" .}}{{end}}

@@ -1,0 +1,50 @@
+{{define "page_admin"}}{{template "begin" .}}{{template "topnav" .}}
+<main class="container">
+<h2>管理后台</h2>
+<div class="tabs">
+  <button class="tab active" data-tab="grant">授权管理</button>
+  <button class="tab" data-tab="overview">授权总览</button>
+  <button class="tab" data-tab="audit">审计</button>
+</div>
+
+<section id="tab-grant" class="card">
+  <h3>新建 / 更新授权</h3>
+  <div class="row">
+    <select id="g_user" style="min-width:170px">
+      {{range .Employees}}<option value="{{.UUMUserID}}">{{.DisplayName}}（{{.UUMUserID}}）</option>{{end}}
+    </select>
+    <select id="g_kb" style="min-width:200px">
+      {{range .AllKBs}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+    </select>
+    <select id="g_perm"><option value="viewer">viewer（只读）</option><option value="editor">editor（可编辑）</option></select>
+    <select id="g_cat"><option>团队</option><option>公共</option><option>个人</option></select>
+    <input id="g_days" type="number" placeholder="有效天数(空=永久)" style="width:140px">
+    <button class="primary" onclick="saveGrant()">保存授权</button>
+  </div>
+  <p class="muted">保存后立即生效，变更写入审计；员工与知识库列表实时拉取 WeKnora。</p>
+</section>
+
+<section id="tab-overview" class="card" hidden>
+  <h3>授权总览（{{len .GrantRows}} 条）</h3>
+  <input id="g_filter" placeholder="按工号过滤…" oninput="filterGrants(this.value)">
+  <table id="grant_table">
+    <tr><th>工号</th><th>知识库</th><th>权限</th><th>分组</th><th>状态</th><th>有效期至</th><th>操作</th></tr>
+    {{range .GrantRows}}
+    <tr data-user="{{.UUMUserID}}">
+      <td>{{.UUMUserID}}</td><td>{{.KBName}}</td><td>{{.Permission}}</td><td>{{.Category}}</td>
+      <td>{{if .Expired}}<span class="st expired">已过期</span>{{else if eq .Status "revoked"}}<span class="st revoked">已回收</span>{{else}}<span class="st active">生效中</span>{{end}}</td>
+      <td>{{if .ValidUntil.Valid}}{{.ValidUntil.Time.Format "2006-01-02 15:04"}}{{else}}永久{{end}}</td>
+      <td>{{if and (eq .Status "active") (not .Expired)}}<button class="danger" onclick="revokeGrant({{.ID}})">回收</button>{{end}}</td>
+    </tr>{{end}}
+  </table>
+</section>
+
+<section id="tab-audit" class="card" hidden>
+  <h3>审计日志（最近 100 条）</h3>
+  <table>
+    <tr><th>时间</th><th>操作人</th><th>动作</th><th>对象</th><th>详情</th></tr>
+    {{range .AuditRows}}<tr><td>{{.CreatedAt.Format "01-02 15:04:05"}}</td><td>{{.Actor}}</td><td>{{.Action}}</td><td>{{.Target}}</td><td class="mono">{{.Detail}}</td></tr>
+    {{else}}<tr><td colspan="5" class="muted">（空）</td></tr>{{end}}
+  </table>
+</section>
+</main>{{template "end" .}}{{end}}

@@ -1,0 +1,24 @@
+{{define "page_chat"}}{{template "begin" .}}{{template "topnav" .}}
+<main class="container">
+<div class="chat-wrap">
+  <aside class="card side">
+    <h3>会话</h3>
+    <button class="primary wide" onclick="newSession()">＋ 新会话</button>
+    <ul id="sesslist">
+      {{range .Sessions}}<li><a href="javascript:void(0)" onclick="loadSession('{{.ID}}')">{{if .Title}}{{.Title}}{{else}}{{.ID}}{{end}}</a></li>
+      {{else}}<li class="muted">（暂无）</li>{{end}}
+    </ul>
+  </aside>
+  <section class="card chat-main">
+    <div class="row">
+      <span>引用知识库：</span>
+      {{range .KBs}}<label class="chip"><input type="checkbox" value="{{.ID}}" class="kbchk"> {{.Name}}</label>{{end}}
+    </div>
+    <div id="messages" class="messages"><div class="muted centered">选择/新建会话后提问（回答流式呈现，含引用）</div></div>
+    <div class="row">
+      <input id="chatq" placeholder="输入问题，回车发送…" style="flex:1" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="primary" onclick="sendChat()">发送</button>
+    </div>
+  </section>
+</div>
+</main>{{template "end" .}}{{end}}
