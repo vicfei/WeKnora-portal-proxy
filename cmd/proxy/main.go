@@ -4,6 +4,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"log"
 	"net/http"
@@ -44,7 +45,9 @@ func main() {
 	// background session sweeper (every 10 min)
 	go func() {
 		for range time.Tick(10 * time.Minute) {
-			_ = st.SweepSessions(nil)
+			// never pass a nil context: database/sql panics on it and
+			// would take down the whole process (found in GUI-acceptance)
+			_ = st.SweepSessions(context.Background())
 		}
 	}()
 
